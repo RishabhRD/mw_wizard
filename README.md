@@ -19,7 +19,7 @@ Specifically, this wizard:
 ## Install and Use
 
 ```
-git clone https://github.com/LukeSmithxyz/mutt-wizard
+git clone https://github.com/RishabhRD/mutt-wizard
 cd mutt-wizard
 sudo make install
 ```
@@ -90,9 +90,7 @@ To give you an example of the interface, here's an idea:
 
 - Try mutt-wizard out on weird machines and weird email addresses and report any errors.
 - Open a PR to add new server information into `domains.csv` so their users can more easily use mutt-wizard.
-- If nothing else, [Donate!](https://paypal.me/LukeMSmith)
 
-See Luke's website [here](https://lukesmith.xyz). Email him at [luke@lukesmith.xyz](mailto:luke@lukesmith.xyz).
 
 mutt-wizard is free/libre software, licensed under the GPLv3.
 
