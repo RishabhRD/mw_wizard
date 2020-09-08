@@ -1,20 +1,13 @@
 #!/bin/sh
 
+source $HOME/.config/zsh/.zshenv
+
 # Sync mail and give notification about new mail.
 pgrep -u "${USER:=$LOGNAME}" > /dev/null || { echo "$USER not logged in; sync will not run."; exit;}
 
 # Set config directory
 config_dir="$HOME/.config/isync/mbsyncrc"
 
-# Export environment variables for XDG Directory support
-export XDG_CONFIG_HOME="$HOME"/.config
-export XDG_CACHE_HOME="$HOME"/.cache
-export XDG_DATA_HOME="$HOME"/.local/share
-export GNUPGHOME="$HOME/.gnupg"
-export PASSWORD_STORE_DIR="$XDG_DATA_HOME"/pass
-export EDITOR="nvim"
-export TERMINAL="st"
-export BROWSER="brave"
 # Run only if not already running any instance.
 pgrep -x mbsync -c "$config_dir" > /dev/null && { echo "mbsync is already running." ;exit ;}
 
@@ -28,9 +21,9 @@ STATUSBAR="dwmblocks"
 
 # Settings are different for MacOS (Darwin) systems.
 if [ "$(uname)" = "Darwin" ]; then
-    notify() { osascript -e "display notification \"$2 in $1\" with title \"You've got Mail\" subtitle \"Account: $account\"" && sleep 2 ;}
+	notify() { osascript -e "display notification \"$2 in $1\" with title \"You've got Mail\" subtitle \"Account: $account\"" && sleep 2 ;}
 else
-    notify() { notify-send --app-name="mutt-wizard" "mutt-wizard" "📬 $2 new mail(s) in \`$1\` account." ;}
+	notify() { notify-send --app-name="mutt-wizard" "mutt-wizard" "📬 $2 new mail(s) in \`$1\` account." ;}
 fi
 
 #Check account for new mail. Notify if there is new content
@@ -41,14 +34,14 @@ syncandnotify() {
 	newcount=$(echo "$new" | sed '/^\s*$/d' | wc -l)
 	if [ "$newcount" -gt "0" ]; then
 		notify-send "$acc" "$newcount" &&
-		for file in $new; do
-			# Extract subject and sender from mail.
-			from=$(awk '/^From: / && ++n ==1,/^\<.*\>:/' "$file" | perl -CS -MEncode -ne 'print decode("MIME-Header", $_)' | awk '{ $1=""; if (NF>=3)$NF=""; print $0 }' | sed 's/^[[:blank:]]*[\"'\''\<]*//;s/[\"'\''\>]*[[:blank:]]*$//')
-			subject=$(awk '/^Subject: / && ++n == 1,/^\<.*\>: / && ++i == 2' "$file" | head -n-1 | perl -CS -MEncode -ne 'print decode("MIME-Header", $_)' | sed 's/^Subject: //' | sed 's/^{[[:blank:]]*[\"'\''\<]*//;s/[\"'\''\>]*[[:blank:]]*$//' | tr -d '\n')
-			notify-send --app-name="mutt-wizard" "📬 $from:" "$subject" &
-		done
-	fi
-}
+			for file in $new; do
+				# Extract subject and sender from mail.
+				from=$(awk '/^From: / && ++n ==1,/^\<.*\>:/' "$file" | perl -CS -MEncode -ne 'print decode("MIME-Header", $_)' | awk '{ $1=""; if (NF>=3)$NF=""; print $0 }' | sed 's/^[[:blank:]]*[\"'\''\<]*//;s/[\"'\''\>]*[[:blank:]]*$//')
+				subject=$(awk '/^Subject: / && ++n == 1,/^\<.*\>: / && ++i == 2' "$file" | head -n-1 | perl -CS -MEncode -ne 'print decode("MIME-Header", $_)' | sed 's/^Subject: //' | sed 's/^{[[:blank:]]*[\"'\''\<]*//;s/[\"'\''\>]*[[:blank:]]*$//' | tr -d '\n')
+				notify-send --app-name="mutt-wizard" "📬 $from:" "$subject" &
+			done
+				fi
+			}
 
 # Sync accounts passed as argument or all
 if [ "$#" -eq "0" ]; then
